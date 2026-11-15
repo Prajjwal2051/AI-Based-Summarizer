@@ -8,13 +8,15 @@ from langchain_core.documents import Document
 def extract_youtube_video_id(url_or_id: str) -> str:
     """Extract YouTube video ID from various URL formats or plain ID."""
     url_or_id = url_or_id.strip()
+    if not url_or_id:
+        raise ValueError("YouTube URL or ID cannot be empty.")
     
     # Direct 11-char ID check (alphanumeric, -, _)
     if re.fullmatch(r"^[a-zA-Z0-9_-]{11}$", url_or_id):
         return url_or_id
 
     patterns = [
-        r"(?:v=|\/v\/|youtu\.be\/|\/embed\/|\/shorts\/|\/e\/|watch\?v=|\&v=)([^#\&\?\n]{11})",
+        r"(?:v=|\/v\/|youtu\.be\/|\/embed\/|\/shorts\/|\/live\/|\/e\/|watch\?v=|\&v=)([^#\&\?\n\/]{11})",
         r"^[a-zA-Z0-9_-]{11}$"
     ]
     for pattern in patterns:

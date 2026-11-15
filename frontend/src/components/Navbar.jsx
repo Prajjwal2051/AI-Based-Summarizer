@@ -9,7 +9,8 @@ import {
   Cpu,
   Layers,
   ChevronDown,
-  Check
+  Check,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -28,6 +29,9 @@ export default function Navbar({
   availableModels = [],
   activeModel,
   onModelChange,
+  sessions = [],
+  currentSessionId,
+  onSelectSession,
   onNewSession,
   theme,
   onToggleTheme,
@@ -66,6 +70,51 @@ export default function Navbar({
             <Plus className="h-3.5 w-3.5 text-muted-foreground" />
             <span>New Session</span>
           </Button>
+
+          {/* Past Sessions Switcher */}
+          {sessions.length > 1 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground shadow-none max-w-[140px]"
+                >
+                  <MessageSquare className="h-3 w-3 text-muted-foreground shrink-0" />
+                  <span className="truncate">
+                    {sessions.find((s) => s.id === currentSessionId)?.title || 'Chats'}
+                  </span>
+                  <ChevronDown className="h-3 w-3 text-muted-foreground/60 shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 animate-fade-in">
+                <DropdownMenuLabel className="text-[11px] font-semibold text-muted-foreground">
+                  Switch Chat ({sessions.length})
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {sessions.map((s) => (
+                  <DropdownMenuItem
+                    key={s.id}
+                    onClick={() => onSelectSession(s.id)}
+                    className="flex items-center justify-between text-xs cursor-pointer"
+                  >
+                    <span
+                      className={`truncate max-w-[180px] ${
+                        s.id === currentSessionId
+                          ? 'font-medium text-foreground'
+                          : 'text-muted-foreground'
+                      }`}
+                    >
+                      {s.title}
+                    </span>
+                    {s.id === currentSessionId && (
+                      <Check className="h-3.5 w-3.5 text-primary shrink-0 ml-1" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {/* Model Selector & Actions */}

@@ -53,8 +53,6 @@ dist/
 .vite/
 
 # --- Environment Variables & Sensitive Credentials ---
-.env
-.env.local
 .env.*.local
 *.local
 # Keep example env tracked
@@ -80,7 +78,6 @@ Thumbs.db
 Desktop.ini
 
 # Editors
-.vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
@@ -91,3 +88,4 @@ Desktop.ini
 # --- Agent & Dev Tools ---
 .codegraph/
 .gemini/
+config.bat

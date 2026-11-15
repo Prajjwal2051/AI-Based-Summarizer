@@ -136,11 +136,19 @@ export default function App() {
     }));
   };
 
-  const handleSendMessage = async (queryText) => {
+  const handleSelectSession = (id) => {
+    if (isLoading && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsLoading(false);
+    }
+    setCurrentSessionId(id);
+  };
+
+  const handleSendMessage = async (queryText, customHistory = null) => {
     if (!queryText || isLoading) return;
 
     const userMessage = { role: 'user', content: queryText };
-    const prevMessages = currentSession.messages;
+    const prevMessages = customHistory !== null ? customHistory : currentSession.messages;
     const newMessages = [...prevMessages, userMessage];
 
     // Set user message immediately
@@ -193,9 +201,10 @@ export default function App() {
           buffer = lines.pop() || '';
 
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('data: ')) {
               try {
-                const parsed = JSON.parse(line.replace('data: ', ''));
+                const parsed = JSON.parse(trimmedLine.slice(6));
                 if (parsed.type === 'sources') {
                   assistantMsg.sources = parsed.data || [];
                   updateCurrentSessionMessages([...newMessages, { ...assistantMsg }]);
@@ -241,9 +250,8 @@ export default function App() {
     for (let i = msgs.length - 1; i >= 0; i--) {
       if (msgs[i].role === 'user') {
         const lastQuery = msgs[i].content;
-        // Trim messages back to before this assistant response
-        updateCurrentSessionMessages(msgs.slice(0, i));
-        handleSendMessage(lastQuery);
+        const trimmedHistory = msgs.slice(0, i);
+        handleSendMessage(lastQuery, trimmedHistory);
         break;
       }
     }
@@ -288,6 +296,9 @@ export default function App() {
         availableModels={availableModels}
         activeModel={activeModel}
         onModelChange={handleModelChange}
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        onSelectSession={handleSelectSession}
         onNewSession={handleNewSession}
         theme={theme}
         onToggleTheme={toggleTheme}

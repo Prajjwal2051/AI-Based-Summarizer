@@ -17,6 +17,8 @@ def scrape_webpage(url: str) -> Dict[str, Any]:
       }
     """
     url = url.strip()
+    if not url:
+        raise ValueError("Website URL cannot be empty.")
     if not (url.startswith("http://") or url.startswith("https://")):
         url = "https://" + url
 
@@ -43,8 +45,8 @@ def scrape_webpage(url: str) -> Dict[str, Any]:
     og_title = soup.find("meta", property="og:title")
     if og_title and og_title.get("content"):
         title = og_title["content"].strip()
-    elif soup.title and soup.title.string:
-        title = soup.title.string.strip()
+    elif soup.title and soup.title.get_text():
+        title = soup.title.get_text().strip()
     elif soup.find("h1"):
         title = soup.find("h1").get_text().strip()
     else:

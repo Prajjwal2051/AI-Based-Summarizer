@@ -94,5 +94,41 @@ class TestRAGBackend(unittest.TestCase):
         list_after = self.client.get("/api/resources")
         self.assertFalse(any(r["id"] == src_id for r in list_after.json()["resources"]))
 
+    def test_07_idempotent_reingestion_no_duplicates(self):
+        # Ingesting the exact same source twice should update without duplicating FAISS vectors
+        payload = {
+            "title": "Idempotency Test",
+            "content": "Line 1 of unique content for vector duplication test."
+        }
+        res1 = self.client.post("/api/ingest/text", json=payload)
+        self.assertEqual(res1.status_code, 200)
+        chunks_1 = self.client.get("/api/status").json()["total_chunks"]
+
+        # Re-ingest same
+        res2 = self.client.post("/api/ingest/text", json=payload)
+        self.assertEqual(res2.status_code, 200)
+        chunks_2 = self.client.get("/api/status").json()["total_chunks"]
+
+        # Total chunks count should remain identical
+        self.assertEqual(chunks_1, chunks_2)
+
+    def test_08_youtube_url_formats(self):
+        from backend.scrapers.youtube import extract_youtube_video_id
+        # Test standard, shorts, live, and trailing query parameters
+        self.assertEqual(extract_youtube_video_id("https://www.youtube.com/watch?v=fU3zdkIzXBk"), "fU3zdkIzXBk")
+        self.assertEqual(extract_youtube_video_id("https://youtu.be/fU3zdkIzXBk?si=1234"), "fU3zdkIzXBk")
+        self.assertEqual(extract_youtube_video_id("https://www.youtube.com/shorts/fU3zdkIzXBk"), "fU3zdkIzXBk")
+        self.assertEqual(extract_youtube_video_id("https://www.youtube.com/live/fU3zdkIzXBk"), "fU3zdkIzXBk")
+
+    def test_09_model_separation(self):
+        models_res = self.client.get("/api/models")
+        self.assertEqual(models_res.status_code, 200)
+        data = models_res.json()
+        self.assertIn("available_models", data)
+        self.assertIn("available_embed_models", data)
+        # Verify embedding models aren't passed as chat models
+        for m in data["available_models"]:
+            self.assertNotIn("embed", m.lower())
+
 if __name__ == "__main__":
     unittest.main()

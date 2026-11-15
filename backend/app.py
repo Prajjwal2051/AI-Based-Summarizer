@@ -67,18 +67,36 @@ def get_status():
 
 @app.get("/api/models")
 def list_models():
-    """Query local Ollama to list installed models."""
-    installed_models = []
+    """Query local Ollama to list installed models separated by chat and embedding."""
+    all_models = []
     try:
         req = urllib.request.Request(f"{settings.ollama_base_url}/api/tags", headers={"User-Agent": "RAG-Agent"})
         with urllib.request.urlopen(req, timeout=3) as resp:
             data = json.loads(resp.read().decode())
-            installed_models = [m.get("name") for m in data.get("models", [])]
-    except Exception as e:
-        installed_models = [settings.ollama_model]
+            all_models = [m.get("name") for m in data.get("models", [])]
+    except Exception:
+        all_models = [settings.ollama_model, settings.ollama_embed_model]
+
+    # Filter embedding models vs LLM generation models
+    embed_keywords = ["embed", "bge", "nomic-embed", "minilm", "gte"]
+    chat_models = []
+    embed_models = []
+
+    for name in all_models:
+        lowered = name.lower()
+        if any(k in lowered for k in embed_keywords):
+            embed_models.append(name)
+        else:
+            chat_models.append(name)
+
+    if not chat_models:
+        chat_models = [settings.ollama_model]
+    if not embed_models:
+        embed_models = [settings.ollama_embed_model]
 
     return {
-        "available_models": installed_models,
+        "available_models": chat_models,
+        "available_embed_models": embed_models,
         "active_model": settings.ollama_model,
         "active_embed_model": settings.ollama_embed_model,
         "base_url": settings.ollama_base_url
@@ -97,7 +115,7 @@ def update_settings(payload: SettingsUpdateRequest):
 
     settings.update(**updates)
     if "ollama_embed_model" in updates or "ollama_base_url" in updates:
-        rag_engine._init_embeddings()
+        rag_engine.rebuild_embeddings()
 
     return {
         "message": "Settings updated successfully",
@@ -155,9 +173,9 @@ def ingest_website(payload: URLIngestRequest):
 
 
 @app.post("/api/ingest/pdf")
-async def ingest_pdf(file: UploadFile = File(...)):
+def ingest_pdf(file: UploadFile = File(...)):
     try:
-        content = await file.read()
+        content = file.file.read()
         parsed_data = extract_pdf_data(content, filename=file.filename or "document.pdf")
         resource = rag_engine.ingest_data(parsed_data)
         return {

@@ -30,6 +30,18 @@ class RAGEngine:
             base_url=settings.ollama_base_url
         )
 
+    def rebuild_embeddings(self):
+        """Reinitialize embeddings model and rebuild FAISS index from stored raw documents."""
+        self._init_embeddings()
+        all_chunks = []
+        for chunks in self.raw_documents.values():
+            all_chunks.extend(chunks)
+
+        if all_chunks:
+            self.vector_store = FAISS.from_documents(all_chunks, self.embeddings)
+        else:
+            self.vector_store = None
+
     def get_llm(self, model_name: Optional[str] = None, temperature: float = 0.2):
         chosen_model = model_name or settings.ollama_model
         return ChatOllama(
@@ -58,6 +70,12 @@ class RAGEngine:
 
         # Chunk the input documents
         chunks = self.splitter.split_documents(data_dict["documents"])
+        if not chunks:
+            raise ValueError(f"No usable text chunks could be extracted from '{title}'.")
+
+        # If resource already exists, clean up old vectors to avoid duplicate pollution
+        if source_id in self.resources:
+            self.remove_resource(source_id)
 
         # Tag each chunk with its index and parent source
         for idx, chunk in enumerate(chunks):

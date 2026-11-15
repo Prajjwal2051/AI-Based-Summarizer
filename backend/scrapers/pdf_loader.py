@@ -9,12 +9,21 @@ def extract_pdf_data(file_source: Union[bytes, io.BytesIO, str], filename: str =
     Extracts text and page-level metadata from a PDF file.
     file_source can be bytes, BytesIO, or a file path string.
     """
-    if isinstance(file_source, bytes):
-        reader = pypdf.PdfReader(io.BytesIO(file_source))
-    elif isinstance(file_source, str):
-        reader = pypdf.PdfReader(file_source)
-    else:
-        reader = pypdf.PdfReader(file_source)
+    try:
+        if isinstance(file_source, bytes):
+            reader = pypdf.PdfReader(io.BytesIO(file_source))
+        elif isinstance(file_source, str):
+            reader = pypdf.PdfReader(file_source)
+        else:
+            reader = pypdf.PdfReader(file_source)
+    except Exception as e:
+        raise ValueError(f"Failed to read PDF file '{filename}': {str(e)}")
+
+    if reader.is_encrypted:
+        raise ValueError(
+            f"The PDF file '{filename}' is password-protected or encrypted. "
+            "Please remove encryption and try again."
+        )
 
     num_pages = len(reader.pages)
     if num_pages == 0:

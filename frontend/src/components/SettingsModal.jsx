@@ -22,6 +22,7 @@ export default function SettingsModal({
   const [model, setModel] = useState(activeModel || 'gemma2:2b');
   const [embedModel, setEmbedModel] = useState('embeddinggemma');
   const [availableModels, setAvailableModels] = useState([]);
+  const [availableEmbedModels, setAvailableEmbedModels] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -31,6 +32,7 @@ export default function SettingsModal({
         .then((res) => res.json())
         .then((data) => {
           if (data.available_models) setAvailableModels(data.available_models);
+          if (data.available_embed_models) setAvailableEmbedModels(data.available_embed_models);
           if (data.active_model) setModel(data.active_model);
           if (data.active_embed_model) setEmbedModel(data.active_embed_model);
           if (data.base_url) setBaseUrl(data.base_url);
@@ -141,18 +143,38 @@ export default function SettingsModal({
 
           {/* Embedding Model */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground flex items-center gap-1">
-              <Layers className="h-3 w-3 text-muted-foreground" />
-              <span>Embedding Model</span>
-            </label>
-            <Input
-              type="text"
-              value={embedModel}
-              onChange={(e) => setEmbedModel(e.target.value)}
-              placeholder="e.g. embeddinggemma"
-              required
-              className="h-8 text-xs font-mono"
-            />
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-foreground flex items-center gap-1">
+                <Layers className="h-3 w-3 text-muted-foreground" />
+                <span>Embedding Model</span>
+              </label>
+              <span className="text-[10px] text-muted-foreground">
+                (Default: embeddinggemma)
+              </span>
+            </div>
+
+            {availableEmbedModels.length > 0 ? (
+              <select
+                value={embedModel}
+                onChange={(e) => setEmbedModel(e.target.value)}
+                className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                {availableEmbedModels.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <Input
+                type="text"
+                value={embedModel}
+                onChange={(e) => setEmbedModel(e.target.value)}
+                placeholder="e.g. embeddinggemma"
+                required
+                className="h-8 text-xs font-mono"
+              />
+            )}
             <p className="text-[10px] text-muted-foreground">
               Used for vector similarity search in the FAISS index.
             </p>
