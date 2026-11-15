@@ -1,0 +1,270 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* shadcn UI - Light Theme */
+  --background: #ffffff;
+  --foreground: #09090b;
+  
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #a1a1aa;
+  
+  --radius: 8px;
+  --sidebar: #fafafa;
+  --sidebar-border: #e4e4e7;
+  
+  --code-bg: #f4f4f5;
+  --code-color: #09090b;
+  --quote-border: #18181b;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  /* shadcn UI - Dark Theme (Zinc / Obsidian) */
+  --background: #09090b;
+  --foreground: #fafafa;
+  
+  --card: #09090b;
+  --card-foreground: #fafafa;
+  
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fafafa;
+  
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #52525b;
+  
+  --sidebar: #121214;
+  --sidebar-border: #27272a;
+  
+  --code-bg: #18181b;
+  --code-color: #fafafa;
+  --quote-border: #fafafa;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Scrollbar Styling - shadcn subtle */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Modal and Backdrop styling compliant with modern web guidance */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* Markdown Styling (shadcn article style) */
+.markdown-body {
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--foreground);
+}
+
+.markdown-body p {
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  color: var(--foreground);
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+
+.markdown-body h1 { font-size: 1.2rem; }
+.markdown-body h2 { font-size: 1.05rem; }
+.markdown-body h3 { font-size: 0.95rem; }
+
+.markdown-body ul, .markdown-body ol {
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-body code {
+  color: var(--foreground);
+  background: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-size: 85%;
+}
+
+.markdown-body pre {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  color: var(--foreground);
+  border: none;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.markdown-body blockquote {
+  border-left: 2px solid var(--primary);
+  padding-left: 0.85rem;
+  color: var(--muted-foreground);
+  margin: 0.75rem 0;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.88rem;
+}
+
+.markdown-body th, .markdown-body td {
+  border: 1px solid var(--border);
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+}
+
+.markdown-body th {
+  background: var(--secondary);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Citations Details Disclosure (shadcn Accordion pattern) */
+details.shadcn-disclosure {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  margin-top: 0.65rem;
+  font-size: 0.8rem;
+  overflow: hidden;
+}
+
+details.shadcn-disclosure summary {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.12s;
+}
+
+details.shadcn-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+details.shadcn-disclosure summary:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+details.shadcn-disclosure[open] summary {
+  border-bottom: 1px solid var(--border);
+}
+
+details.shadcn-disclosure .disclosure-body {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--background);
+}
